@@ -20,6 +20,12 @@
         "description": "Uri of the your user image"
       }
     },
+     "dataDiskUrlParam": {
+      "type": "string",
+      "metadata": {
+        "description": "URL to data disk resource"
+      }
+    },    
     "dnsLabelPrefix": {
       "type": "string",
       "metadata": {
@@ -50,10 +56,23 @@
     },
     "vmSize": {
       "type": "string",
-      "metadata": {
-        "description": "This is the size of your VM"
-      }
-    },
+      "defaultValue": "Standard_A3",
+      "allowedValues": [
+        "Standard_A3",
+        "Standard_A4",
+        "Standard_A5",
+        "Standard_A6",
+        "Standard_A7",
+        "Standard_A8",
+        "Standard_A9",
+        "Standard_A10",
+        "Standard_A11",
+        "Standard_D3",
+        "Standard_D4",
+        "Standard_D12",
+        "Standard_D13",
+        "Standard_D14"
+      ],
     "newOrExistingVnet": {
       "allowedValues": [ "new", "existing" ],
       "type": "string",
@@ -77,12 +96,14 @@
     }
   },
   "variables": {
+    "dataDiskUrl": "[parameters('dataDiskUrlParam')]",
+    "dataDiskVhdName": "[concat(variables('dataDiskUrl'),'-',variables('vmName'),'.vhd')]",
     "publicIPAddressName": "[concat(parameters('customVmName'),'IP')]",
     "vmName": "[parameters('customVmName')]",
     "nicName": "[concat(parameters('customVmName'),'Nic')]",
     "publicIPAddressType": "Dynamic",
     "apiVersion": "2015-06-15",
-    "templatelink": "[concat('https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/101-vm-from-user-image/',parameters('newOrExistingVnet'),'vnet.json')]"
+    "templatelink": "[concat('https://raw.githubusercontent.com/hifrank/azure-quickstart-templates/master/101-vm-from-user-image/',parameters('newOrExistingVnet'),'vnet.json')]"
   },
   "resources": [
     {
@@ -172,7 +193,20 @@
             "vhd": {
               "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('userImageStorageAccountName')), variables('apiVersion')).primaryEndpoints.blob, 'vhds/',variables('vmName'), uniquestring(resourceGroup().id), 'osDisk.vhd')]"
             }
-          }
+          },
+           "dataDisks": [
+            {
+              "name": "[concat(variables('vmName'),'-dataDisk')]",
+              "lun": 0,
+              "createOption": "FromImage",
+              "image": {
+                "uri": "[variables('dataDiskUrl')]"
+              },
+              "vhd": {
+                "uri": "[variables('dataDiskVhdName')]"
+              }
+            }
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [

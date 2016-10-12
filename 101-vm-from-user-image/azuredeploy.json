@@ -20,12 +20,12 @@
         "description": "Uri of the your user image"
       }
     },
-     "dataDiskUrlParam": {
+    "dataDiskUrlParam": {
       "type": "string",
       "metadata": {
         "description": "URL to data disk resource"
       }
-    },    
+    },
     "dnsLabelPrefix": {
       "type": "string",
       "metadata": {
@@ -75,10 +75,13 @@
       ]
     },
     "newOrExistingVnet": {
-      "allowedValues": [ "new", "existing" ],
+      "allowedValues": [
+        "new",
+        "existing"
+      ],
       "type": "string",
       "metadata": {
-        "description":  "Select if this template needs a new VNet or will reference an existing VNet"
+        "description": "Select if this template needs a new VNet or will reference an existing VNet"
       }
     },
     "newOrExistingVnetName": {
@@ -86,6 +89,13 @@
       "defaultValue": "",
       "metadata": {
         "description": "New or Existing VNet Name"
+      }
+    },
+    "virtualNetworkResourceGroupName": {
+      "type": "string",
+      "defaultValue": "resourceGroup().name",
+      "metadata": {
+        "description": "resource group of the vnet"
       }
     },
     "newOrExistingSubnetName": {
@@ -108,25 +118,28 @@
   },
   "resources": [
     {
-            "apiVersion": "2015-01-01",
-            "name": "vnet-template",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "incremental",
-                "templateLink": {
-                    "uri": "[variables('templatelink')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "virtualNetworkName": {
-                        "value": "[parameters('newOrExistingVnetName')]"
-                    },
-                    "subnetName": {
-                        "value": "[parameters('newOrExistingSubnetName')]"
-                    }
-                }
-            }
+      "apiVersion": "2015-01-01",
+      "name": "vnet-template",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[variables('templatelink')]",
+          "contentVersion": "1.0.0.0"
         },
+        "parameters": {
+          "virtualNetworkResourceGroup": {
+            "value": "[parameters('virtualNetworkResourceGroupName')]"
+          },
+          "virtualNetworkName": {
+            "value": "[parameters('newOrExistingVnetName')]"
+          },
+          "subnetName": {
+            "value": "[parameters('newOrExistingSubnetName')]"
+          }
+        }
+      }
+    },
     {
       "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/publicIPAddresses",
@@ -195,7 +208,7 @@
               "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('userImageStorageAccountName')), variables('apiVersion')).primaryEndpoints.blob, 'vhds/',variables('vmName'), uniquestring(resourceGroup().id), 'osDisk.vhd')]"
             }
           },
-           "dataDisks": [
+          "dataDisks": [
             {
               "name": "[concat(variables('vmName'),'-dataDisk')]",
               "lun": 0,

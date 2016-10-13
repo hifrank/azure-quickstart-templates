@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkResourceGroup": {
+      "type": "string",
+      "defaultValue": "resourceGroup().name"
+    },
+    "virtualNetworkName": {
+      "type": "string"
+    },
+    "subnetName": {
+      "type": "string"
+    }
+  },
+  "variables": { },
+  "resources": [ ],
+  "outputs": {
+    "subnet1Ref": {
+      "value": "[concat(resourceId(parameters('virtualNetworkResourceGroup'),'Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName')), '/subnets/',parameters('subnetName'))]",
+      "type": "string"
+    }
+  }
+}

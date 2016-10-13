@@ -107,7 +107,7 @@
     },
     "newOrExistingSubnetName": {
       "type": "string",
-      "defaultValue": "Subnet1",
+      "defaultValue": "APSubnet",
       "metadata": {
         "description": "Subnet Name"
       }
@@ -219,6 +219,7 @@
             {
               "name": "[concat(variables('vmName'),'-dataDisk')]",
               "lun": 0,
+              "caching": "ReadWrite",
               "createOption": "FromImage",
               "image": {
                 "uri": "[variables('dataDiskUrl')]"
@@ -239,7 +240,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": "true",
-            "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('userImageStorageAccountName')), variables('apiVersion')).primaryEndpoints.blob)]"
+            "storageUri": "[concat(reference(resourceId(parameters('userImageStorageAccountResourceGroupName'),'Microsoft.Storage/storageAccounts/', parameters('userImageStorageAccountName')), variables('apiVersion')).primaryEndpoints.blob)]"
           }
         }
       }
